@@ -1,24 +1,23 @@
+import { Box, Button, Heading } from '@chakra-ui/react';
 import { NextPage } from 'next';
-import Head from 'next/head';
+import Link from 'next/link';
 import React from 'react';
+import { playGuideVideo } from 'utils/playVideos';
 
 const Index: NextPage = () => {
-  return (
-    <>
-      <Head>
-        <title>Next.js Starter</title>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
-        <meta
-          name="description"
-          content="Don't take too long to get started!"
-        />
-      </Head>
+  const handleOnStart = () => {
+    playGuideVideo();
+  };
 
-      <div className="container">
-        <div>seven visual</div>
-      </div>
-    </>
+  return (
+    <Box p={10}>
+      <Heading mb={4}>Welcome</Heading>
+      <Link href="/main">
+        <a>
+          <Button onClick={handleOnStart}>Get started</Button>
+        </a>
+      </Link>
+    </Box>
   );
 };
 

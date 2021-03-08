@@ -1,9 +1,18 @@
+import { ChakraProvider } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
-import React from 'react';
-import './global.css';
+import React, { useEffect } from 'react';
+import { playWelcomeVideo } from 'utils/playVideos';
 
 const App = ({ Component, pageProps }: AppProps) => {
-  return <Component {...pageProps} />;
+  useEffect(() => {
+    playWelcomeVideo();
+  }, []);
+
+  return (
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  );
 };
 
 export default App;
