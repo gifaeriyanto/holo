@@ -11,7 +11,7 @@ import {
 } from 'utils/playVideos';
 import { GUIDE_VIDEO } from 'utils/variables';
 
-const Index: NextPage = () => {
+const Main: NextPage = () => {
   const [isGuiding, setIsGuiding] = useState(true);
 
   const data = [
@@ -76,4 +76,4 @@ const Index: NextPage = () => {
   return <Box p={10}>{listOfContent}</Box>;
 };
 
-export default Index;
+export default Main;
