@@ -2,15 +2,10 @@ import { useInterval, Box } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import React, { useState } from 'react';
 import ReactPlayer from 'react-player';
-import {
-  getVideoPlaying,
-  playGuideVideo,
-  playVideo,
-  playWelcomeVideo,
-} from 'utils/playVideos';
+import { getVideoPlaying, playGuideVideo } from 'utils/playVideos';
 import { GUIDE_VIDEO, WELCOME_VIDEO } from 'utils/variables';
 
-const Index: NextPage = () => {
+const Display: NextPage = () => {
   const [playing, setPlaying] = useState(WELCOME_VIDEO);
   const [isWelcomingOrGuiding, setIsWelcomingOrGuiding] = useState(true);
 
@@ -41,4 +36,4 @@ const Index: NextPage = () => {
   );
 };
 
-export default Index;
+export default Display;
