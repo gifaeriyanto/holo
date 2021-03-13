@@ -6,4 +6,5 @@ export const GUIDE_VIDEO =
 
 export const LOCALSTORAGE_KEYS = {
   playing: 'playing',
+  accessToken: 'access-token',
 };

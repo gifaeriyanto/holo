@@ -1,15 +1,14 @@
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { routes } from 'utils/routes';
 
-const withAuth = (WrappedComponent) => {
-  const withAuthHoc = ({ ...props }) => {
+const noAuth = (WrappedComponent) => {
+  const noAuthHoc = ({ ...props }) => {
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-      if (!localStorage.getItem('access-token')) {
-        router.push(routes.client.login.url);
+      if (localStorage.getItem('access-token')) {
+        router.back();
         return;
       }
       setMounted(true);
@@ -21,7 +20,7 @@ const withAuth = (WrappedComponent) => {
     return mounted ? <WrappedComponent {...props} /> : null;
   };
 
-  return withAuthHoc;
+  return noAuthHoc;
 };
 
-export default withAuth;
+export default noAuth;
