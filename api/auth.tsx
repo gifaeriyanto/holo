@@ -12,10 +12,16 @@ export interface LoginResponse {
 }
 
 export const login = async ({ username, password }: LoginParams) => {
-  const res: AxiosResponse<LoginResponse> = await API.post(APIPaths.login, {
-    username,
-    password,
-  });
+  const formData = new FormData();
+  formData.append('username', username);
+  formData.append('password', password);
+  const res: AxiosResponse<LoginResponse> = await API.post(
+    APIPaths.login,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
   return res.data;
 };
 
@@ -23,5 +29,7 @@ export const useAuth = (params: LoginParams) => {
   return useQuery('login', () => login(params), {
     enabled: Boolean(params.username) && Boolean(params.password),
     cacheTime: 0,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 };

@@ -28,14 +28,18 @@ const Login: NextPage = () => {
     password: '',
   });
   const toast = useToast();
-  const { data: authData, isError, isFetching } = useAuth(loginParams);
+  const { data: authData, isError, isFetching, refetch } = useAuth(loginParams);
 
   const onSubmit = (data: LoginParams) => {
     setLoginParams(data);
   };
 
   useEffect(() => {
-    if (authData) {
+    refetch();
+  }, [loginParams]);
+
+  useEffect(() => {
+    if (authData?.access_token) {
       localStorage.setItem(
         LOCALSTORAGE_KEYS.accessToken,
         authData.access_token,
