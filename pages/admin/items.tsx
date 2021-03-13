@@ -204,22 +204,24 @@ const Items: NextPage = () => {
                   />
                   <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
                 </FormControl>
-                <FormControl isDisabled={isSubmitting}>
+                <FormControl>
                   <FormLabel>Thumbnail</FormLabel>
                   <InputFile
                     name="thumbnail"
                     accept=".jpg, .png, .jpeg"
                     onChange={handleChangeThumbnail}
+                    isDisabled={isSubmitting}
                   >
                     Change thumbnail
                   </InputFile>
                 </FormControl>
-                <FormControl isDisabled={isSubmitting}>
+                <FormControl>
                   <FormLabel>Video</FormLabel>
                   <InputFile
                     name="video"
                     accept=".mp4"
                     onChange={handleChangeVideo}
+                    isDisabled={isSubmitting}
                   >
                     Change video
                   </InputFile>
@@ -229,7 +231,12 @@ const Items: NextPage = () => {
             </ModalBody>
 
             <ModalFooter mt={8}>
-              <Button variant="ghost" mr={4} onClick={onCloseEdit}>
+              <Button
+                variant="ghost"
+                mr={4}
+                onClick={onCloseEdit}
+                isDisabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button
