@@ -1,4 +1,5 @@
-import { API, APIPaths } from 'api/utils/instance';
+import { API } from 'api/utils/instance';
+import { APIPaths } from 'api/utils/path';
 import { AxiosResponse } from 'axios';
 import { useQuery } from 'react-query';
 

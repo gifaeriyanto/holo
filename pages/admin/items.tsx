@@ -1,8 +1,9 @@
 import {
+  useDisclosure,
   Box,
   Button,
-  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Grid,
   HStack,
@@ -15,16 +16,24 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useDisclosure,
   VStack,
 } from '@chakra-ui/react';
+import {
+  createItem,
+  deleteItem,
+  updateItem,
+  useItems,
+  CreateItemParams,
+  UpdateItemParams,
+} from 'api/items';
 import InputFile from 'components/inputFile';
 import VideoPreview from 'components/videoPreview';
 import AdminLayout from 'layouts/admin';
 import { NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
-import { RiPencilFill, RiDeleteBin2Fill } from 'react-icons/ri';
+import { RiDeleteBin2Fill, RiPencilFill } from 'react-icons/ri';
 
 const Items: NextPage = () => {
   const {
@@ -38,6 +47,11 @@ const Items: NextPage = () => {
     onClose: onCloseDelete,
   } = useDisclosure();
   const [editKey, setEditKey] = useState(-1);
+  const [video, setVideo] = useState<File>();
+  const [thumbnail, setThumbnail] = useState<File>();
+  const { data, refetch } = useItems();
+  const { register, errors, handleSubmit, reset } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isOpenEdit) {
@@ -45,32 +59,55 @@ const Items: NextPage = () => {
     }
   }, [isOpenEdit]);
 
-  const data = [
-    {
-      id: '1',
-      title: 'Lorem ipsum dolor sit amet',
-      video:
-        'https://cdn.videvo.net/videvo_files/video/free/2018-07/small_watermarked/180607_A_101_preview.webm',
-    },
-    {
-      id: '2',
-      title: 'Lorem ipsum dolor sit amet consectetur.',
-      video:
-        'https://cdn.videvo.net/videvo_files/video/premium/video0040/small_watermarked/900-1_900-2983-PD2_preview.webm',
-    },
-    {
-      id: '3',
-      title: 'Similique quas dolore vel?',
-      video:
-        'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4',
-    },
-    {
-      id: '4',
-      title: 'Similique quas dolore vel?',
-      video:
-        'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4',
-    },
-  ];
+  const resetForm = () => {
+    setEditKey(-1);
+    reset();
+    setVideo(undefined);
+    setThumbnail(undefined);
+    onCloseEdit();
+    onCloseDelete();
+    setIsSubmitting(false);
+  };
+
+  const onCreate = (createParams: CreateItemParams) => {
+    setIsSubmitting(true);
+    createItem({
+      title: createParams.title,
+      thumbnail,
+      video,
+    }).then(() => {
+      resetForm();
+      refetch();
+    });
+  };
+
+  const onUpdate = (updateParams: UpdateItemParams) => {
+    setIsSubmitting(true);
+    updateItem({
+      id: data[editKey].id,
+      title: updateParams.title,
+      thumbnail,
+      video,
+    }).then(() => {
+      resetForm();
+      refetch();
+    });
+  };
+
+  const onDelete = () => {
+    deleteItem(data[editKey].id).then(() => {
+      resetForm();
+      refetch();
+    });
+  };
+
+  const handleChangeVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVideo(e.currentTarget.files[0]);
+  };
+
+  const handleChangeThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setThumbnail(e.currentTarget.files[0]);
+  };
 
   return (
     <AdminLayout
@@ -82,9 +119,21 @@ const Items: NextPage = () => {
       }
     >
       <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-        {data.map((item, key) => (
-          <Box pb={4} pos="relative">
-            <VideoPreview url={item.video} width="100%" height="200px" />
+        {data?.map((item, key) => (
+          <Box pb={4} pos="relative" key={key}>
+            {item.thumbnail ? (
+              <Box
+                w="100%"
+                h="200px"
+                borderRadius="lg"
+                bgImage={`url(${item.thumbnail})`}
+                bgSize="cover"
+                bgPos="center"
+                bgRepeat="no-repeat"
+              />
+            ) : (
+              <VideoPreview url={item.video} width="100%" height="200px" />
+            )}
             <HStack pos="absolute" top="10px" right="10px">
               <IconButton
                 aria-label="Ddit item"
@@ -98,7 +147,10 @@ const Items: NextPage = () => {
                 aria-label="Delete item"
                 icon={<RiDeleteBin2Fill />}
                 colorScheme="red"
-                onClick={onOpenDelete}
+                onClick={() => {
+                  onOpenDelete();
+                  setEditKey(key);
+                }}
               />
             </HStack>
             <Text
@@ -124,38 +176,72 @@ const Items: NextPage = () => {
             <Button variant="ghost" mr={4} onClick={onCloseDelete}>
               Cancel
             </Button>
-            <Button colorScheme="red">Yes, sure</Button>
+            <Button colorScheme="red" onClick={onDelete}>
+              Yes, sure
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
       <Modal isOpen={isOpenEdit} onClose={onCloseEdit}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{editKey < 0 ? 'Create new' : 'Edit'} item</ModalHeader>
-          <ModalBody>
-            <VStack spacing={4}>
-              <FormControl>
-                <FormLabel>Title</FormLabel>
-                <Input
-                  placeholder="Title"
-                  defaultValue={editKey < 0 ? '' : data[editKey].title}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Video</FormLabel>
-                <InputFile name="video">Change video</InputFile>
-              </FormControl>
-            </VStack>
-          </ModalBody>
+        <form onSubmit={handleSubmit(editKey < 0 ? onCreate : onUpdate)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              {editKey < 0 ? 'Create new' : 'Edit'} item
+            </ModalHeader>
+            <ModalBody>
+              <VStack spacing={4}>
+                <FormControl isInvalid={errors.title} isDisabled={isSubmitting}>
+                  <FormLabel>Title</FormLabel>
+                  <Input
+                    name="title"
+                    placeholder="Title"
+                    defaultValue={editKey < 0 ? '' : data[editKey].title}
+                    ref={register({
+                      required: 'Title is required',
+                    })}
+                  />
+                  <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+                </FormControl>
+                <FormControl isDisabled={isSubmitting}>
+                  <FormLabel>Thumbnail</FormLabel>
+                  <InputFile
+                    name="thumbnail"
+                    accept=".jpg, .png, .jpeg"
+                    onChange={handleChangeThumbnail}
+                  >
+                    Change thumbnail
+                  </InputFile>
+                </FormControl>
+                <FormControl isDisabled={isSubmitting}>
+                  <FormLabel>Video</FormLabel>
+                  <InputFile
+                    name="video"
+                    accept=".mp4"
+                    onChange={handleChangeVideo}
+                  >
+                    Change video
+                  </InputFile>
+                  <FormErrorMessage>{errors.video?.message}</FormErrorMessage>
+                </FormControl>
+              </VStack>
+            </ModalBody>
 
-          <ModalFooter mt={8}>
-            <Button variant="ghost" mr={4} onClick={onCloseEdit}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue">Save update</Button>
-          </ModalFooter>
-        </ModalContent>
+            <ModalFooter mt={8}>
+              <Button variant="ghost" mr={4} onClick={onCloseEdit}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="blue"
+                type="submit"
+                isDisabled={isSubmitting}
+              >
+                {editKey < 0 ? 'Create new item' : 'Save update'}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </form>
       </Modal>
     </AdminLayout>
   );

@@ -6,6 +6,18 @@ const InputFile: React.FC<InputProps> = ({ children, ...props }) => {
   const inputFileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState('');
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileName(e.currentTarget?.files[0]?.name || '');
+    if (props.onChange) {
+      props.onChange(e);
+    }
+  };
+
+  const propsUpdated = {
+    ...props,
+    onChange: handleChange,
+  };
+
   return (
     <>
       <Button
@@ -21,11 +33,10 @@ const InputFile: React.FC<InputProps> = ({ children, ...props }) => {
       )}
       <Input
         type="file"
-        ref={inputFileRef}
         display="none"
-        onChange={(e) => setFileName(e.currentTarget?.files[0]?.name || '')}
-        accept=".mp4"
-        {...props}
+        ref={inputFileRef}
+        onChange={handleChange}
+        {...propsUpdated}
       />
     </>
   );
