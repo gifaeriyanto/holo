@@ -6,9 +6,14 @@ import { routes } from 'utils/routes';
 
 export interface AdminLayoutProps {
   title: string;
+  addOns?: React.ReactNode;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({
+  title,
+  addOns,
+  children,
+}) => {
   const router = useRouter();
 
   const listOfMenu = Object.entries(routes.admin).map((menu) => (
@@ -41,16 +46,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
         {listOfMenu}
       </Flex>
       <Box p={12} flexBasis="calc(100% - 300px)" h="100vh" overflowY="auto">
-        <Heading
-          borderBottom="2px dashed"
+        <Flex
+          justify="space-between"
+          borderBottom="2px dotted"
           borderColor="gray.300"
           pb={4}
-          bgGradient="linear(to-b, #0575E6, #021B79)"
-          bgClip="text"
           mb={12}
         >
-          {title}
-        </Heading>
+          <Heading bgGradient="linear(to-b, #0575E6, #021B79)" bgClip="text">
+            {title}
+          </Heading>
+          {addOns && <Box>{addOns}</Box>}
+        </Flex>
         {children}
       </Box>
     </Flex>
