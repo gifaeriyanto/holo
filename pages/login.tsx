@@ -35,7 +35,9 @@ const Login: NextPage = () => {
   };
 
   useEffect(() => {
-    refetch();
+    if (loginParams.username) {
+      refetch();
+    }
   }, [loginParams]);
 
   useEffect(() => {
