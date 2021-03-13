@@ -30,6 +30,7 @@
     "next": "^9.5.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-hook-form": "^6.15.4",
     "react-icons": "^4.2.0",
     "react-idle-timer": "^4.5.5",
     "react-player": "^2.9.0",
