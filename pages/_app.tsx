@@ -1,6 +1,7 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
 import React, { useEffect } from 'react';
+import theme from 'theme';
 import { playWelcomeVideo } from 'utils/playVideos';
 
 const App = ({ Component, pageProps }: AppProps) => {
@@ -9,7 +10,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <Component {...pageProps} />
     </ChakraProvider>
   );
